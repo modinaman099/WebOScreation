@@ -1,0 +1,1 @@
+I have made this WebOS site for movies. It will help people distinguish movies on the basis of the genre and find movies they want to see. It also suggests you movies on random basis . I have used Claude Sonnet 4.6 to debug my project when it was having problem deploying.  
