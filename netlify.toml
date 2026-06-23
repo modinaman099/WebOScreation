@@ -1,0 +1,39 @@
+# ────────────────────────────────────────────────────────────
+# DesiCinema OS — Netlify Configuration
+# ────────────────────────────────────────────────────────────
+
+[build]
+  publish = "."      # root directory contains index.html
+
+# ── Global HTTP headers (applied to every response) ─────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection       = "1; mode=block"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
+    Permissions-Policy     = "camera=(), microphone=(), geolocation=()"
+
+# ── Long-term cache for static assets (1 year) ──────────────
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ── Redirect www → apex (update with your real domain) ──────
+[[redirects]]
+  from   = "https://www.desicinema-os.netlify.app/*"
+  to     = "https://desicinema-os.netlify.app/:splat"
+  status = 301
+  force  = true
