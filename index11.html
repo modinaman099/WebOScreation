@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary SEO -->
+    <title>DesiCinema OS — Top Indian Comedy Films</title>
+    <meta name="description" content="DesiCinema OS is a webOS-style cinema browser featuring the top Indian comedy films. Discover, explore, and pick random titles from Bollywood's finest comedies.">
+    <meta name="keywords" content="Indian comedy movies, Bollywood films, Hera Pheri, 3 Idiots, Andaz Apna Apna, DesiCinema, Indian cinema">
+    <meta name="author" content="DesiCinema OS">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://desicinema-os.netlify.app/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://desicinema-os.netlify.app/">
+    <meta property="og:title" content="DesiCinema OS — Top Indian Comedy Films">
+    <meta property="og:description" content="A webOS-style cinema browser featuring the best Indian comedy films. Pick random titles or explore by genre.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DesiCinema OS — Top Indian Comedy Films">
+    <meta name="twitter:description" content="A webOS-style cinema browser featuring the best Indian comedy films.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200">
+
+    <!-- Browser chrome + favicon -->
+    <meta name="theme-color" content="#0a0b10">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body { background: #0a0b10; color: #f5f5f7; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; }
+        #app-layout { display: grid; grid-template-columns: 260px 1fr; height: calc(100vh - 50px); }
+        
+        #sidebar { background: #11121a; border-right: 1px solid #222533; padding: 30px 20px; display: flex; flex-direction: column; gap: 30px; }
+        .brand-title { font-size: 20px; font-weight: 800; background: linear-gradient(90deg, #ff9933, #ffffff, #138808); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }
+        .nav-group { display: flex; flex-direction: column; gap: 8px; }
+        .nav-btn { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; color: #94a3b8; font-weight: 600; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.2s; width: 100%; }
+        .nav-btn:hover, .nav-btn.active { background: #1e2130; color: #fff; }
+        .nav-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+        #main-workspace { padding: 40px; overflow-y: auto; position: relative; background: radial-gradient(circle at top right, #1c1326, #0a0b10 60%); height: 100%; }
+        .hero-banner { background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1000') center/cover; height: 240px; border-radius: 20px; padding: 40px; display: flex; flex-direction: column; justify-content: center; margin-bottom: 35px; border: 1px solid #222533; }
+        
+        .window { position: absolute; width: 460px; background: rgba(20, 21, 30, 0.92); border: 1px solid #333644; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); display: none; z-index: 10; overflow: hidden; backdrop-filter: blur(20px); }
+        .win-header { background: rgba(30, 33, 48, 0.6); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #2d303e; }
+        .close-btn { background: #ff5f56; border: none; width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
+
+        .win-body { padding: 25px; height: 300px; overflow-y: auto; }
+        select { width: 100%; padding: 12px; margin-bottom: 20px; background: #11121a; border: 1px solid #333644; color: #fff; border-radius: 8px; outline: none; }
+        .action-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #e50914, #b80710); border: none; color: #fff; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(229,9,20,0.3); }
+        .action-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(229,9,20,0.5); }
+
+        .movie-card { background: #161824; padding: 18px; margin-top: 20px; border-radius: 10px; border-left: 4px solid #ff9933; }
+        .movie-item { padding: 12px; border-bottom: 1px solid #222533; font-size: 14px; display: flex; justify-content: space-between; }
+
+        #taskbar { height: 50px; background: #090a0f; position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; border-top: 1px solid #1c1d26; z-index: 999; color: #64748b; font-size: 13px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <div id="app-layout">
+        <aside id="sidebar">
+            <div class="brand-title">DesiCinema OS</div>
+            <nav class="nav-group">
+                <button id="btn-win-spin" class="nav-btn" onclick="toggleWin('win-spin')">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z"/></svg>
+                    CineSpin
+                </button>
+                <button id="btn-win-search" class="nav-btn" onclick="toggleWin('win-search')">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5c0 1.61.59 3.09 1.57 4.23l-.27.28v.79l5 4.99L19 20.49l-4.99-5z"/></svg>
+                    Explore DB
+                </button>
+            
+<button id="btn-win-celeb" class="nav-btn" onclick="toggleWin('win-celeb')">⭐ Celebrity Picks</button>
+
+</nav>
+        </aside>
+
+        <main id="main-workspace">
+            <div class="hero-banner">
+                <h1 style="font-size: 28px; margin-bottom: 8px;">🎭 Top Indian Comedy Films</h1>
+                <p style="color: #ca8a04; font-weight: 600;">Welcome to your personalized comedy cinema environment.</p>
+            </div>
+
+            <div id="win-spin" class="window" style="top: 250px; left: 50px;">
+                <div class="win-header">
+                    <span style="font-weight:600;">🎬 CineSpin Picker</span>
+                    <button class="close-btn" aria-label="Close CineSpin Picker" onclick="toggleWin('win-spin')"></button>
+                </div>
+                <div class="win-body">
+                    <p style="margin-bottom: 20px; color: #94a3b8; font-size: 14px;">Let the deck decide your next absolute watch match from Indian Film History.</p>
+                    <button class="action-btn" onclick="spinMovie()">Pick Random Title</button>
+                    <div id="spin-result"></div>
+                </div>
+            </div>
+
+            <div id="win-search" class="window" style="top: 180px; left: 350px;">
+                <div class="win-header">
+                    <span style="font-weight:600;">🔍 Database Matrix</span>
+                    <button class="close-btn" aria-label="Close Database Matrix" onclick="toggleWin('win-search')"></button>
+                </div>
+                <div class="win-body">
+                    <select id="genre-select" onchange="filterMovies()">
+                        <option value="All">All Genres</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Comedy-Drama">Comedy-Drama</option>
+                        <option value="Satire">Satire</option>
+                    </select>
+                    <div id="search-results"></div>
+                </div>
+            </div>
+        
+<div id="win-celeb" class="window" style="top:220px;left:820px;">
+<div class="win-header"><span style="font-weight:600;">⭐ Celebrity Recommendations</span>
+<button class="close-btn" onclick="toggleWin('win-celeb')"></button></div>
+<div class="win-body">
+<label>Select a Celebrity</label>
+<select id="celeb-select">
+<option value="">Select a celebrity</option>
+<option value="salman_khan">Salman Khan</option>
+<option value="ranbir_kapoor">Ranbir Kapoor</option>
+<option value="ranveer_singh">Ranveer Singh</option>
+<option value="shah_rukh_khan">Shah Rukh Khan</option>
+<option value="hrithik_roshan">Hrithik Roshan</option>
+<option value="deepika_padukone">Deepika Padukone</option>
+</select>
+<div id="celeb-results"></div>
+</div></div>
+
+</main>
+    </div>
+
+    <div id="taskbar">
+        <div>System Engine v3.0</div>
+        <div id="clock" aria-live="polite">00:00:00 AM</div>
+    </div>
+
+    <script>
+        const movies = [
+            { title: "Hera Pheri", year: 2000, genre: "Comedy", industry: "Bollywood" },
+            { title: "Andaz Apna Apna", year: 1994, genre: "Comedy", industry: "Bollywood" },
+            { title: "3 Idiots", year: 2009, genre: "Comedy-Drama", industry: "Bollywood" },
+            { title: "Golmaal", year: 2006, genre: "Comedy", industry: "Bollywood" },
+            { title: "Dhamaal", year: 2007, genre: "Satire", industry: "Bollywood" }
+        ];
+
+        function toggleWin(id) {
+            const w = document.getElementById(id);
+            const btn = document.getElementById(`btn-${id}`);
+            
+            // Evaluates inline computed layout values accurately
+            const isCurrentlyVisible = window.getComputedStyle(w).display === 'block';
+
+            if (isCurrentlyVisible) {
+                w.style.display = 'none';
+                if(btn) btn.classList.remove('active');
+            } else {
+                w.style.display = 'block';
+                if(btn) btn.classList.add('active');
+                bringToFront(w);
+            }
+        }
+
+        function bringToFront(win) {
+            document.querySelectorAll('.window').forEach(w => w.style.zIndex = 10);
+            win.style.zIndex = 100;
+        }
+
+        function spinMovie() {
+            const m = movies[Math.floor(Math.random() * movies.length)];
+            document.getElementById('spin-result').innerHTML = `
+                <div class="movie-card">
+                    <h4 style="color:#ff9933; margin-bottom:4px;">${m.title}</h4>
+                    <span style="color:#64748b; font-size:12px;">${m.industry} • ${m.year}</span>
+                </div>`;
+        }
+
+        function filterMovies() {
+            const gen = document.getElementById('genre-select').value;
+            const container = document.getElementById('search-results');
+            container.innerHTML = '';
+            movies.filter(m => gen === 'All' || m.genre === gen).forEach(m => {
+                container.innerHTML += `<div class="movie-item"><span><b>${m.title}</b></span><i style="color:#138808">${m.genre}</i></div>`;
+            });
+        }
+
+        function initClock() {
+            const update = () => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); };
+            setInterval(update, 1000);
+            update();
+        }
+
+        // Refactored isolated drag mechanics
+        document.querySelectorAll('.window').forEach(win => {
+            win.addEventListener('mousedown', () => bringToFront(win));
+            const header = win.querySelector('.win-header');
+            let isDrag = false;
+            let x = 0, y = 0;
+            
+            header.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('close-btn')) return;
+                isDrag = true;
+                x = e.clientX - win.offsetLeft;
+                y = e.clientY - win.offsetTop;
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDrag) return;
+                win.style.left = (e.clientX - x) + 'px';
+                win.style.top = (e.clientY - y) + 'px';
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDrag = false;
+            });
+        });
+
+        initClock();
+        filterMovies();
+    
+// Celebrity recommendation feature
+const celebrityMovies={
+salman_khan:["Bajrangi Bhaijaan","Sultan","Tiger Zinda Hai"],
+ranbir_kapoor:["Yeh Jawaani Hai Deewani","Animal","Rockstar"],
+ranveer_singh:["Dhurandhar","83","Padmaavat"],
+shah_rukh_khan:["Pathaan","Chennai Express","My Name Is Khan"],
+hrithik_roshan:["Jodhaa Akbar","War","Krrish"],
+deepika_padukone:["Piku","Padmaavat","Chennai Express"]
+};
+
+const searchBody=document.querySelector('#win-search .win-body');
+if(searchBody){
+ const wrap=document.createElement('div');
+ wrap.innerHTML=`
+ <hr style="margin:20px 0;border-color:#333644">
+ <label style="display:block;margin-bottom:8px">Celebrity Picks</label>
+ <select id="celeb-select">
+ <option value="">Select a celebrity</option>
+  <option value="salman_khan">Salman Khan</option>
+ <option value="ranbir_kapoor">Ranbir Kapoor</option>
+ <option value="ranveer_singh">Ranveer Singh</option>
+ <option value="shah_rukh_khan">Shah Rukh Khan</option>
+ <option value="hrithik_roshan">Hrithik Roshan</option>
+ <option value="deepika_padukone">Deepika Padukone</option>
+ </select>
+ <div id="celeb-results"></div>`;
+ searchBody.appendChild(wrap);
+ document.getElementById('celeb-select').addEventListener('change',e=>{
+   const out=document.getElementById('celeb-results');
+   const list=celebrityMovies[e.target.value];
+   if(!list){out.innerHTML='';return;}
+   out.innerHTML='<div class="movie-card"><h4>Recommended Movies</h4><ul>'+list.map(x=>`<li>${x}</li>`).join('')+'</ul></div>';
+ });
+}
+
+</script>
+</body>
+</html>
