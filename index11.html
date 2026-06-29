@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -141,119 +140,121 @@
 
     <script>
         const movies = [
-            { title: "Hera Pheri", year: 2000, genre: "Comedy", industry: "Bollywood" },
-            { title: "Andaz Apna Apna", year: 1994, genre: "Comedy", industry: "Bollywood" },
-            { title: "3 Idiots", year: 2009, genre: "Comedy-Drama", industry: "Bollywood" },
-            { title: "Golmaal", year: 2006, genre: "Comedy", industry: "Bollywood" },
-            { title: "Dhamaal", year: 2007, genre: "Satire", industry: "Bollywood" }
+            { title: 'Hera Pheri', year: 2000, genre: 'Comedy', industry: 'Bollywood' },
+            { title: 'Andaz Apna Apna', year: 1994, genre: 'Comedy', industry: 'Bollywood' },
+            { title: '3 Idiots', year: 2009, genre: 'Comedy-Drama', industry: 'Bollywood' },
+            { title: 'Golmaal', year: 2006, genre: 'Comedy', industry: 'Bollywood' },
+            { title: 'Dhamaal', year: 2007, genre: 'Satire', industry: 'Bollywood' }
         ];
 
         function toggleWin(id) {
-            const w = document.getElementById(id);
-            const btn = document.getElementById(`btn-${id}`);
-            
-            // Evaluates inline computed layout values accurately
-            const isCurrentlyVisible = window.getComputedStyle(w).display === 'block';
+            const win = document.getElementById(id);
+            const button = document.getElementById(`btn-${id}`);
+            const isVisible = window.getComputedStyle(win).display === 'block';
 
-            if (isCurrentlyVisible) {
-                w.style.display = 'none';
-                if(btn) btn.classList.remove('active');
-            } else {
-                w.style.display = 'block';
-                if(btn) btn.classList.add('active');
-                bringToFront(w);
+            if (isVisible) {
+                win.style.display = 'none';
+                if (button) button.classList.remove('active');
+                return;
             }
+
+            win.style.display = 'block';
+            if (button) button.classList.add('active');
+            bringToFront(win);
         }
 
         function bringToFront(win) {
-            document.querySelectorAll('.window').forEach(w => w.style.zIndex = 10);
+            document.querySelectorAll('.window').forEach(element => element.style.zIndex = 10);
             win.style.zIndex = 100;
         }
 
         function spinMovie() {
-            const m = movies[Math.floor(Math.random() * movies.length)];
+            const randomMovie = movies[Math.floor(Math.random() * movies.length)];
             document.getElementById('spin-result').innerHTML = `
                 <div class="movie-card">
-                    <h4 style="color:#ff9933; margin-bottom:4px;">${m.title}</h4>
-                    <span style="color:#64748b; font-size:12px;">${m.industry} • ${m.year}</span>
+                    <h4 style="color:#ff9933; margin-bottom:4px;">${randomMovie.title}</h4>
+                    <span style="color:#64748b; font-size:12px;">${randomMovie.industry} • ${randomMovie.year}</span>
                 </div>`;
         }
 
         function filterMovies() {
-            const gen = document.getElementById('genre-select').value;
+            const genre = document.getElementById('genre-select').value;
             const container = document.getElementById('search-results');
-            container.innerHTML = '';
-            movies.filter(m => gen === 'All' || m.genre === gen).forEach(m => {
-                container.innerHTML += `<div class="movie-item"><span><b>${m.title}</b></span><i style="color:#138808">${m.genre}</i></div>`;
-            });
+            const filtered = movies.filter(movie => genre === 'All' || movie.genre === genre);
+
+            container.innerHTML = filtered.map(movie => `
+                <div class="movie-item">
+                    <span><b>${movie.title}</b></span>
+                    <i style="color:#138808">${movie.genre}</i>
+                </div>`).join('');
+        }
+
+        function updateClock() {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
         }
 
         function initClock() {
-            const update = () => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); };
-            setInterval(update, 1000);
-            update();
+            updateClock();
+            setInterval(updateClock, 1000);
         }
 
-        // Refactored isolated drag mechanics
-        document.querySelectorAll('.window').forEach(win => {
-            win.addEventListener('mousedown', () => bringToFront(win));
-            const header = win.querySelector('.win-header');
-            let isDrag = false;
-            let x = 0, y = 0;
-            
-            header.addEventListener('mousedown', (e) => {
-                if (e.target.classList.contains('close-btn')) return;
-                isDrag = true;
-                x = e.clientX - win.offsetLeft;
-                y = e.clientY - win.offsetTop;
+        function initializeDrag() {
+            let activeWindow = null;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            document.addEventListener('mousedown', event => {
+                const header = event.target.closest('.win-header');
+                if (!header || event.target.classList.contains('close-btn')) return;
+
+                const win = header.closest('.window');
+                if (!win) return;
+
+                activeWindow = win;
+                offsetX = event.clientX - win.offsetLeft;
+                offsetY = event.clientY - win.offsetTop;
+                bringToFront(win);
             });
-            
-            document.addEventListener('mousemove', (e) => {
-                if (!isDrag) return;
-                win.style.left = (e.clientX - x) + 'px';
-                win.style.top = (e.clientY - y) + 'px';
+
+            document.addEventListener('mousemove', event => {
+                if (!activeWindow) return;
+                activeWindow.style.left = `${event.clientX - offsetX}px`;
+                activeWindow.style.top = `${event.clientY - offsetY}px`;
             });
-            
+
             document.addEventListener('mouseup', () => {
-                isDrag = false;
+                activeWindow = null;
             });
-        });
+        }
+
+        function initializeCelebrityRecommendations() {
+            const celebrityMovies = {
+                salman_khan: ['Bajrangi Bhaijaan', 'Sultan', 'Tiger Zinda Hai'],
+                ranbir_kapoor: ['Yeh Jawaani Hai Deewani', 'Animal', 'Rockstar'],
+                ranveer_singh: ['Dhurandhar', '83', 'Padmaavat'],
+                shah_rukh_khan: ['Pathaan', 'Chennai Express', 'My Name Is Khan'],
+                hrithik_roshan: ['Jodhaa Akbar', 'War', 'Krrish'],
+                deepika_padukone: ['Piku', 'Padmaavat', 'Chennai Express']
+            };
+
+            const select = document.getElementById('celeb-select');
+            const results = document.getElementById('celeb-results');
+            if (!select || !results) return;
+
+            select.addEventListener('change', event => {
+                const picks = celebrityMovies[event.target.value];
+                results.innerHTML = picks ? `
+                    <div class="movie-card">
+                        <h4>Recommended Movies</h4>
+                        <ul>${picks.map(title => `<li>${title}</li>`).join('')}</ul>
+                    </div>` : '';
+            });
+        }
 
         initClock();
+        initializeDrag();
         filterMovies();
-    
-// Celebrity recommendation feature
-const celebrityMovies={
-salman_khan:["Bajrangi Bhaijaan","Sultan","Tiger Zinda Hai"],
-ranbir_kapoor:["Yeh Jawaani Hai Deewani","Animal","Rockstar"],
-ranveer_singh:["Dhurandhar","83","Padmaavat"],
-shah_rukh_khan:["Pathaan","Chennai Express","My Name Is Khan"],
-hrithik_roshan:["Jodhaa Akbar","War","Krrish"],
-deepika_padukone:["Piku","Padmaavat","Chennai Express"]
-};
-
-const searchBody=document.querySelector('#win-search .win-body');
-if(searchBody){
- const wrap=document.createElement('div');
- wrap.innerHTML=`
- <hr style="margin:20px 0;border-color:#333644">
- <label style="display:block;margin-bottom:8px">Celebrity Picks</label>
- <select id="search-celeb-select">
- <option value="">Select a celebrity</option>
-  <option value="salman_khan">Salman Khan</option>
- <option value="ranbir_kapoor">Ranbir Kapoor</option>
- <option value="ranveer_singh">Ranveer Singh</option>
- <option value="shah_rukh_khan">Shah Rukh Khan</option>
- <option value="hrithik_roshan">Hrithik Roshan</option>
- <option value="deepika_padukone">Deepika Padukone</option>
- </select>
-document.getElementById('search-celeb-select').addEventListener('change',e=>{ document.getElementById('celeb-select').addEventListener('change',e=>{
-const out=document.getElementById('search-celeb-results');   const list=celebrityMovies[e.target.value];
-   if(!list){out.innerHTML='';return;}
-   out.innerHTML='<div class="movie-card"><h4>Recommended Movies</h4><ul>'+list.map(x=>`<li>${x}</li>`).join('')+'</ul></div>';
- });
-}
-
-</script>
+        initializeCelebrityRecommendations();
+    </script>
 </body>
 </html>
