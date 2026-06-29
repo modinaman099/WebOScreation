@@ -238,7 +238,7 @@ if(searchBody){
  wrap.innerHTML=`
  <hr style="margin:20px 0;border-color:#333644">
  <label style="display:block;margin-bottom:8px">Celebrity Picks</label>
- <select id="celeb-select">
+ <select id="search-celeb-select">
  <option value="">Select a celebrity</option>
   <option value="salman_khan">Salman Khan</option>
  <option value="ranbir_kapoor">Ranbir Kapoor</option>
@@ -247,11 +247,8 @@ if(searchBody){
  <option value="hrithik_roshan">Hrithik Roshan</option>
  <option value="deepika_padukone">Deepika Padukone</option>
  </select>
- <div id="celeb-results"></div>`;
- searchBody.appendChild(wrap);
- document.getElementById('celeb-select').addEventListener('change',e=>{
-   const out=document.getElementById('celeb-results');
-   const list=celebrityMovies[e.target.value];
+document.getElementById('search-celeb-select').addEventListener('change',e=>{ document.getElementById('celeb-select').addEventListener('change',e=>{
+const out=document.getElementById('search-celeb-results');   const list=celebrityMovies[e.target.value];
    if(!list){out.innerHTML='';return;}
    out.innerHTML='<div class="movie-card"><h4>Recommended Movies</h4><ul>'+list.map(x=>`<li>${x}</li>`).join('')+'</ul></div>';
  });
